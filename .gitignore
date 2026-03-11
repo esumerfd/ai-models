@@ -1,0 +1,36 @@
+# Virtual environments
+.venv/
+
+# Generated model artifacts
+**/gen/
+*.pth
+*.gguf
+*.onnx
+*.bin
+*.safetensors
+
+# Training data (scraped/generated)
+**/data/training.txt
+**/data/*.txt
+**/data/*.jsonl
+**/data/*.parquet
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# macOS
+.DS_Store
+
+# Logs and checkpoints
+*.log
+runs/
+wandb/
+lightning_logs/

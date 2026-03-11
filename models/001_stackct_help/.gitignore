@@ -1,0 +1,12 @@
+# Virtual environment
+.venv/
+
+# Generated model checkpoints and tokenizer
+gen/
+
+# Training data
+phase_training/data/
+
+# Python cache
+__pycache__/
+*.pyc
