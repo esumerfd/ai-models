@@ -1,15 +1,8 @@
-# First Small Language Model
+# 001 — GPT-Style Causal Transformer
 
-A mono-repo for building, training, and deploying a small domain-specific language model (SLM)
-from scratch using a variety of techques as I learn then.
-
-All content is suspect as its created knows nothing.
-
-# 001_first_model
-
-How to use PyTorch. The model is trained on the
-[STACK](https://www.stackct.com) construction estimating platform support knowledge base and
-deployed to a Raspberry Pi cluster running the
+A GPT-style causal transformer built from scratch with PyTorch, trained on the
+[STACK](https://www.stackct.com) construction estimating platform support knowledge base.
+Deployed to a Raspberry Pi cluster running the
 [Raspberry Pi AI HAT+ 2](https://www.raspberrypi.com/products/ai-hat-plus-2/) (Hailo-10H, 10 TOPS).
 
 Based on the tutorial:
@@ -21,7 +14,7 @@ by Abdul Sami.
 ## Repo Structure
 
 ```
-first-small/
+001_stackct_help/
 ├── core/                   # Shared model architecture, config, and tokenizer
 │   ├── config.py           # All hyperparameters
 │   ├── model.py            # Transformer: Head, MultiHeadAttention, Block, SmallLanguageModel
