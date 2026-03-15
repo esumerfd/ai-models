@@ -9,7 +9,7 @@
 *.bin
 *.safetensors
 
-# Training data (scraped/generated)
+# Training data (retrieved/generated)
 **/data/training.txt
 **/data/*.txt
 **/data/*.jsonl

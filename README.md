@@ -1,5 +1,7 @@
 # AI Models
 
+![AI Models Banner](docs/images/banner.png)
+
 A collection of language model experiments built from scratch — each one exploring a different
 technique, architecture, or dataset.
 
@@ -17,7 +19,7 @@ and deployment.
 **Technique:** GPT-style causal transformer built from scratch with PyTorch
 
 **Data:** [STACK](https://www.stackct.com) construction estimating platform support knowledge base,
-scraped via the Zendesk Help Center API.
+retrieved via the Zendesk Help Center API.
 
 **Architecture:**
 
@@ -51,14 +53,13 @@ python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
-**2. Scrape training data**
+**2. Retrieve training data**
 
 ```bash
-.venv/bin/python phase_1_training/scrape_data.py
+make retrieve
 ```
 
-Fetches all articles from the STACK support site and writes them to
-`phase_1_training/data/training.txt`.
+Fetches all articles from the STACK support site and writes them to `gen/training.txt`.
 
 **3. Train the model**
 

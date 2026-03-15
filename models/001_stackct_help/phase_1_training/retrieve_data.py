@@ -1,9 +1,9 @@
 """
-Scrape support articles from support.stackct.com via the Zendesk Help Center API
-and write them to phase_1_training/data/training.txt.
+Retrieve support articles from support.stackct.com via the Zendesk Help Center API
+and write them to gen/training.txt.
 
 Usage:
-    python phase_1_training/scrape_data.py
+    python phase_1_training/retrieve_data.py
 """
 
 import html
@@ -14,7 +14,7 @@ import time
 import urllib.request
 
 BASE_URL = "https://support.stackct.com/api/v2/help_center/en-us"
-OUTPUT_FILE = "phase_1_training/data/training.txt"
+OUTPUT_FILE = "gen/training.txt"
 PER_PAGE = 100
 DELAY = 0.5  # seconds between requests — be polite
 
@@ -57,7 +57,7 @@ def format_article(article: dict) -> str:
 
 
 def main():
-    os.makedirs("phase_1_training/data", exist_ok=True)
+    os.makedirs("gen", exist_ok=True)
 
     print(f"Fetching articles from {BASE_URL}...")
     articles = fetch_all_articles()

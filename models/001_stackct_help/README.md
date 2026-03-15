@@ -28,9 +28,8 @@ first-small/
 │   └── tokenizer_utils.py  # BPE tokenizer training and encode/decode helpers
 │
 ├── phase_1_training/       # Data collection and model training
-│   ├── scrape_data.py      # Scrapes STACK support articles via Zendesk API
-│   ├── train.py            # Training loop with scheduler and gradient clipping
-│   └── data/               # Generated training data (gitignored)
+│   ├── retrieve_data.py    # Retrieves STACK support articles via Zendesk API
+│   └── train.py            # Training loop with scheduler and gradient clipping
 │
 ├── phase_2_generation/     # Interactive inference
 │   └── generate.py         # Chat REPL using the trained model
@@ -75,14 +74,14 @@ python3.12 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
 
-### 2. Scrape training data
+### 2. Retrieve training data
 
 ```bash
-.venv/bin/python phase_1_training/scrape_data.py
+make retrieve
 ```
 
 Fetches all articles from the STACK support site via the Zendesk Help Center API
-and writes them to `phase_1_training/data/training.txt`.
+and writes them to `gen/training.txt`.
 
 ### 3. Train the model
 
@@ -122,6 +121,7 @@ make ollama-run
 
 | Command | Description |
 |---|---|
+| `make retrieve` | Fetch training data from STACK support site |
 | `make train` | Clean all generated files and retrain from scratch |
 | `make generate` | Interactive chat via native PyTorch inference |
 | `make convert` | Convert checkpoint to GGUF |

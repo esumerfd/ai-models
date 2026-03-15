@@ -22,6 +22,6 @@ SAVE_INTERVAL = 1000      # Save checkpoint every N steps
 TRAIN_SPLIT = 0.9         # Fraction of data used for training
 
 # Paths
-DATA_FILE = "phase_1_training/data/training.txt"
+DATA_FILE = "gen/training.txt"
 CHECKPOINT_DIR = "gen"
 TOKENIZER_FILE = "gen/tokenizer.json"

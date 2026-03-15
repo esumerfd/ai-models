@@ -1,6 +1,9 @@
 ROOT_DIR := $(CURDIR)
 
-.PHONY: train generate convert ollama-load ollama-run capabilities clean-gguf clean-all
+.PHONY: retrieve train generate convert ollama-load ollama-run capabilities clean-gguf clean-all
+
+retrieve:
+	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) retrieve
 
 train: clean-all
 	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) train

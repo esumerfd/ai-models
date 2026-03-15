@@ -75,7 +75,7 @@ def main():
     if not os.path.exists(DATA_FILE):
         raise FileNotFoundError(
             f"Training data not found at '{DATA_FILE}'. "
-            "Create data/training.txt with your domain text."
+            "Run 'make retrieve' to fetch training data."
         )
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         text = f.read()
