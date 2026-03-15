@@ -1,6 +1,6 @@
 # AI Models
 
-![AI Models Banner](docs/images/banner.png)
+![AI Models Banner](docs/images/banner.jpeg)
 
 A collection of language model experiments built from scratch — each one exploring a different
 technique, architecture, or dataset.
