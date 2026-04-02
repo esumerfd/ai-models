@@ -5,8 +5,8 @@ build a small language model from STACK support articles that can answer
 domain-specific questions, deployable to a Raspberry Pi AI HAT+ 2 (Hailo-10H,
 10 TOPS).
 
-All experiments share the same data pipeline (`phase_1_training/retrieve_data.py`),
-the same evaluation criteria, and the same hardware constraint.
+All experiments share the same evaluation criteria and the same hardware
+constraint. The goal is not performnce testing but learning.
 
 ---
 
@@ -19,7 +19,111 @@ Serves as the reference point for all comparisons.
 
 ---
 
-## Experiments
+## Experiments: Data Retrieval
+
+The baseline retrieves HTML articles and strips all tags, collapsing each
+article into a single flat paragraph. This destroys structure that could help
+the model learn — tables become unreadable, numbered steps lose order, and
+nested lists flatten into run-on sentences.
+
+The following data format experiments test whether better input representation
+improves model output, independent of the training technique used.
+
+### DR-A — Markdown-Preserved
+
+**Format:** Convert HTML to proper Markdown instead of stripping it. Preserve
+headings (`##`, `###`), bullet lists, numbered steps, and tables using a
+library like `markdownify` or `html2text`.
+
+**What it tests:** Whether giving the model structural tokens (headings, list
+markers, table pipes) to learn from produces more coherent and structured
+output.
+
+**Key difference from baseline:** The retrieval script converts HTML to Markdown
+rather than stripping tags. Training pipeline is otherwise identical.
+
+---
+
+### DR-B — Structured QA Pairs
+
+**Format:** Transform each article into explicit question/answer pairs that
+match how the model will be used at inference time:
+
+```
+Q: Who can manage users in STACK Takeoff & Estimate?
+A: Account Owners have full access. Office Managers have limited access...
+```
+
+**What it tests:** Whether aligning training data format with the inference
+task (question in, answer out) improves response quality compared to training
+on raw article text.
+
+**Key difference from baseline:** Requires a transformation step to extract
+QA pairs from articles — either rule-based (headings become questions) or
+generated via a larger model.
+
+---
+
+### DR-C — Chunked Sections
+
+**Format:** Split each article at its natural heading boundaries so each
+training sample is a coherent, focused topic. A permissions table becomes one
+chunk, a how-to procedure becomes another.
+
+**What it tests:** Whether smaller, focused training samples produce better
+results than feeding entire articles (which may span multiple unrelated topics)
+as single sequences.
+
+**Key difference from baseline:** Each article becomes multiple training
+samples rather than one. Total token count stays similar but context windows
+see more focused content.
+
+---
+
+### DR-D — Markdown with Front Matter
+
+**Format:** Preserve Markdown structure (as in DR-A) and prepend metadata
+so the model learns document context:
+
+```
+---
+title: Takeoff & Estimate Roles
+category: Permissions
+product: Takeoff & Estimate
+---
+## Full-Access Roles
+...
+```
+
+**What it tests:** Whether metadata tokens help the model associate content
+with categories and products, improving its ability to route questions to the
+right domain knowledge.
+
+**Key difference from baseline:** Requires extracting category/product metadata
+from the Zendesk API (available in the article JSON) in addition to Markdown
+conversion.
+
+---
+
+### DR-E — Structured JSON Lines
+
+**Format:** One JSON object per article with explicit fields:
+
+```json
+{"title": "...", "category": "...", "sections": [...], "related": [...]}
+```
+
+**What it tests:** Whether explicit field boundaries give the model a cleaner
+signal for separating title, content sections, and cross-references — at the
+cost of spending tokens on JSON syntax.
+
+**Key difference from baseline:** Not human-readable. The model must learn JSON
+structure in addition to the domain content. May waste token budget on
+punctuation.
+
+---
+
+## Experiments: Training Technique
 
 ### 002 — Masked Language Modeling (BERT-style)
 
