@@ -14,8 +14,8 @@ by Abdul Sami.
 ## Repo Structure
 
 ```
-001_stackct_help/
-├── core/                   # Shared model architecture, config, and tokenizer
+T1a_bpe_2k/                 # This experiment — BPE tokenizer, 2K vocab (baseline)
+├── core/                   # Model architecture, config, and tokenizer
 │   ├── config.py           # All hyperparameters
 │   ├── model.py            # Transformer: Head, MultiHeadAttention, Block, SmallLanguageModel
 │   └── tokenizer_utils.py  # BPE tokenizer training and encode/decode helpers
@@ -32,7 +32,6 @@ by Abdul Sami.
 │   └── modelfile-ollama    # Ollama Modelfile with system prompt
 │
 ├── gen/                    # Generated model checkpoints and GGUF (gitignored)
-├── docs/                   # Reference documentation
 └── Makefile                # All workflow commands
 ```
 
