@@ -25,7 +25,7 @@ help:
 	@echo "  clean-all     Remove all generated artifacts"
 
 $(VENV)/bin/python:
-	python3 -m venv $(VENV)
+	python3.12 -m venv $(VENV)
 	$(VENV)/bin/pip install -q -r requirements.txt
 
 venv: $(VENV)/bin/python
