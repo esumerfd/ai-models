@@ -5,7 +5,7 @@
 Build a small language model (SLM) from scratch using machine learning techniques.
 
 The ultimate deployment target is the Raspberry Pi cluster located at:
-`/Users/esumerfd/GoogleDrive/edward/Personal/projects/ai/pi-cluster`
+`projects/ai/pi-cluster`
 
 ## Reference
 
