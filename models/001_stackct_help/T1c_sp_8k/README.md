@@ -111,19 +111,26 @@ make ollama-run
 
 ## Experiment Conclusions
 
-### Comparison to T1a (2K vocab)
+### Comparison to T1a/T1b (BPE baseline)
 
-Both models use identical BPE tokenization — the only variable is vocabulary size. The `Ġ` prefix visible in raw generation output is not an error; it is U+0120, the ByteLevel pre-tokenizer's encoding for a leading space (the same convention used by GPT-2). A proper decode pass converts it back to normal text.
+This experiment replaces ByteLevel BPE with SentencePiece Unigram tokenization at 3K vocab (corpus size limited the target 8K). Unlike BPE which merges character pairs bottom-up, Unigram starts with a large candidate set and prunes by likelihood — producing more linguistically motivated splits on domain terminology.
 
-**Tokenization fragmentation:**
+**Corpus-size constraint:**
 
-The 5K vocab does reduce subword fragmentation on common words as expected. In T1a output, domain words split heavily: `f ailure`, `em ailed`, `found ation`, `retain ed`. In T1b, words like `depending`, `navigation`, `integration` appear as single tokens.
+The STACK support corpus (~1.1M chars, ~498 long-line articles) is too small to support an 8K Unigram vocabulary. After splitting articles into sentence-level chunks (yielding ~10,700 training sentences), the maximum achievable vocab was 3,116. Vocab was capped at 3,000.
+
+**Tokenization artifacts:**
+
+Unigram introduces a new class of output artifacts not seen in BPE experiments:
+
+- *Suffix fragments at generation start* — e.g. `mly` appearing as the first output token. Unigram vocabularies contain pure-suffix pieces (no space prefix); when the model's first generated token is one of these, it renders as a bare fragment. This happens because the `<|ai|>` special token boundary doesn't guarantee the model lands at a word-initial position.
+- *Boundary-less concatenation* — e.g. `beend` from tokens `been` + `d`. In SentencePiece, word-initial tokens carry a `▁` prefix; mid-word tokens don't. When two mid-word tokens are decoded adjacently, they concatenate directly with no space, producing spurious strings.
 
 **Generation quality:**
 
-No meaningful improvement in coherence. Both models recite training document fragments rather than answering questions. The bottleneck is model capacity (~5.8M parameters) and training data format, not vocabulary size. At this scale, reducing tokenizer fragmentation does not give the model enough additional semantic signal to produce question-answering behaviour.
+No improvement over BPE baselines. The model recites training document fragments regardless of tokenizer algorithm. The artifacts above are a new failure mode but the root bottleneck remains model capacity and training data format.
 
-**Conclusion:** Vocabulary size in the 2K–5K range is not the limiting factor for this architecture. The next experiments should vary model capacity or training data structure rather than tokenizer vocabulary.
+**Conclusion:** Tokenizer algorithm (BPE vs Unigram) does not meaningfully affect generation coherence at this scale. Unigram introduces additional output artifacts due to its suffix-piece vocabulary structure. The limiting factor is not tokenization strategy.
 
 ---
 
