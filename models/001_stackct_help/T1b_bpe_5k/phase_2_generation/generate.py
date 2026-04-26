@@ -32,7 +32,7 @@ def build_prompt(tokenizer, system: str, query: str) -> list[int]:
 def respond(model, tokenizer, query: str, max_new_tokens: int = 200) -> str:
     model.eval()
     input_ids = build_prompt(tokenizer, SYSTEM_PROMPT, query)
-    output = ""
+    generated_ids = []
 
     for _ in range(max_new_tokens):
         context = torch.tensor([input_ids], dtype=torch.long, device=device)
@@ -43,9 +43,9 @@ def respond(model, tokenizer, query: str, max_new_tokens: int = 200) -> str:
             break
 
         input_ids.append(next_id)
-        output += decode(tokenizer, [next_id]) + " "
+        generated_ids.append(next_id)
 
-    return output.strip()
+    return decode(tokenizer, generated_ids)
 
 
 def main():

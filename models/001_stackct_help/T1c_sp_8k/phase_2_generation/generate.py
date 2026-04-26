@@ -65,7 +65,7 @@ def main():
         )
 
     tokenizer = load_tokenizer()
-    vocab_size = len(tokenizer.get_vocab())
+    vocab_size = tokenizer.get_piece_size()
 
     model = SmallLanguageModel(vocab_size).to(device)
     model.load_state_dict(torch.load(args.checkpoint, map_location=device))
