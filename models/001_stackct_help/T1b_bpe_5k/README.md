@@ -109,6 +109,24 @@ make ollama-run
 
 ---
 
+## Experiment Conclusions
+
+### Comparison to T1a (2K vocab)
+
+Both models use identical BPE tokenization — the only variable is vocabulary size. The `Ġ` prefix visible in raw generation output is not an error; it is U+0120, the ByteLevel pre-tokenizer's encoding for a leading space (the same convention used by GPT-2). A proper decode pass converts it back to normal text.
+
+**Tokenization fragmentation:**
+
+The 5K vocab does reduce subword fragmentation on common words as expected. In T1a output, domain words split heavily: `f ailure`, `em ailed`, `found ation`, `retain ed`. In T1b, words like `depending`, `navigation`, `integration` appear as single tokens.
+
+**Generation quality:**
+
+No meaningful improvement in coherence. Both models recite training document fragments rather than answering questions. The bottleneck is model capacity (~5.8M parameters) and training data format, not vocabulary size. At this scale, reducing tokenizer fragmentation does not give the model enough additional semantic signal to produce question-answering behaviour.
+
+**Conclusion:** Vocabulary size in the 2K–5K range is not the limiting factor for this architecture. The next experiments should vary model capacity or training data structure rather than tokenizer vocabulary.
+
+---
+
 ## Makefile Reference
 
 | Command | Description |
