@@ -1,0 +1,4 @@
+torch
+morfessor
+gguf
+numpy<2
