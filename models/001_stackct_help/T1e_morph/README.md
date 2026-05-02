@@ -131,7 +131,9 @@ make ollama-run
 
 ## Experiment Conclusions
 
-*To be written after training completes — see `results.md`.*
+See `results.md` for full tokenizer analysis, generation samples, and cross-experiment comparison.
+
+Morfessor produces the cleanest output of all five tokenizer experiments — no `Ġ` byte-level artifacts, clean morphological splits (`preconstruction` → `pre` + `construction`), and deterministic word spacing. Vocab size is corpus-derived at ~5,300 morphemes. Generation coherence is unchanged: the model recites training fragments regardless of tokenizer. The root constraint is training data format, not tokenization strategy.
 
 ---
 
