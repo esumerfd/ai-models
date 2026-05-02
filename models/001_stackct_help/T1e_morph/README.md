@@ -14,11 +14,11 @@ by Abdul Sami.
 ## Repo Structure
 
 ```
-T1b_bpe_5k/                 # This experiment — BPE tokenizer, 5K vocab
+T1e_morph/                  # This experiment — Morfessor unsupervised morphological tokenizer
 ├── core/                   # Model architecture, config, and tokenizer
 │   ├── config.py           # All hyperparameters
 │   ├── model.py            # Transformer: Head, MultiHeadAttention, Block, SmallLanguageModel
-│   └── tokenizer_utils.py  # BPE tokenizer training and encode/decode helpers
+│   └── tokenizer_utils.py  # Morfessor tokenizer training and encode/decode helpers
 │
 ├── phase_1_training/       # Data collection and model training
 │   ├── retrieve_data.py    # Retrieves STACK support articles via Zendesk API
@@ -47,8 +47,28 @@ A GPT-style causal transformer built from scratch:
 | Context length | 128 tokens |
 | Attention heads | 8 |
 | Transformer layers | 6 |
-| Parameters | ~5.8M |
-| Vocabulary size | ~5,000 tokens |
+| Parameters | ~5.5M (vocab-size dependent) |
+| Vocabulary size | Corpus-derived (~1–2K morphemes) |
+
+The vocabulary size is not fixed — it is determined by the number of unique morphemes
+Morfessor learns from the training corpus. The embedding layer size adjusts accordingly.
+
+---
+
+## Tokenizer Design
+
+Unlike BPE (T1a–T1d), this experiment uses **Morfessor** — an unsupervised morphological
+segmentation algorithm. Morfessor starts with individual characters and greedily merges
+them using a minimum description length (MDL) objective, learning morpheme boundaries
+directly from word-frequency statistics rather than character-pair merge rules.
+
+Key differences from BPE:
+- Vocabulary is smaller (morpheme inventory, not subword merges)
+- Word-initial position is tracked via a `▁` separator inserted between words
+- No `Ġ` byte-level prefix — morphemes are plain Unicode strings
+- Unknown morphemes fall back to `<unk>` (no byte-level guarantee)
+
+The tokenizer is saved as `gen/tokenizer.pkl` (pickle of the Morfessor model + vocab dict).
 
 ---
 
@@ -81,8 +101,8 @@ and writes them to `gen/training.txt`.
 make train
 ```
 
-Trains for 10,000 steps (~35 passes through the data). Checkpoints are saved to `gen/`
-every 1,000 steps.
+Trains the Morfessor tokenizer on the corpus, then trains the transformer for 10,000
+steps. Checkpoints are saved to `gen/` every 1,000 steps.
 
 ### 4. Chat with the model directly
 
@@ -111,19 +131,7 @@ make ollama-run
 
 ## Experiment Conclusions
 
-### Comparison to T1a (2K vocab)
-
-Both models use identical BPE tokenization — the only variable is vocabulary size. The `Ġ` prefix visible in raw generation output is not an error; it is U+0120, the ByteLevel pre-tokenizer's encoding for a leading space (the same convention used by GPT-2). A proper decode pass converts it back to normal text.
-
-**Tokenization fragmentation:**
-
-The 5K vocab does reduce subword fragmentation on common words as expected. In T1a output, domain words split heavily: `f ailure`, `em ailed`, `found ation`, `retain ed`. In T1b, words like `depending`, `navigation`, `integration` appear as single tokens.
-
-**Generation quality:**
-
-No meaningful improvement in coherence. Both models recite training document fragments rather than answering questions. The bottleneck is model capacity (~5.8M parameters) and training data format, not vocabulary size. At this scale, reducing tokenizer fragmentation does not give the model enough additional semantic signal to produce question-answering behaviour.
-
-**Conclusion:** Vocabulary size in the 2K–5K range is not the limiting factor for this architecture. The next experiments should vary model capacity or training data structure rather than tokenizer vocabulary.
+*To be written after training completes — see `results.md`.*
 
 ---
 
