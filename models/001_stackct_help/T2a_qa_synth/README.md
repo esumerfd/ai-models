@@ -141,7 +141,9 @@ make ollama-run
 
 ## Experiment Conclusions
 
-*To be written after training completes — see `results.md`.*
+See `results.md` for full analysis and cross-experiment comparison.
+
+Q&A synthesis is a meaningful improvement over raw article training (T1a–T1e). Response shape, length control, and within-response coherence are noticeably better — 3 of 5 standard test prompts return relevant, answer-shaped output. The limiting factor is now synthesis coverage: 225 pairs from 201 articles is too sparse for reliable retrieval. Next step is expanding pair density per article.
 
 ---
 
