@@ -1,0 +1,5 @@
+torch
+tokenizers
+gguf
+numpy<2
+nltk
