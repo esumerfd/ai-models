@@ -126,7 +126,9 @@ make convert && make ollama-load && make ollama-run
 
 ## Experiment Conclusions
 
-*To be written after training completes — see `results.md`.*
+See `results.md` for full analysis and comparison to T1d control.
+
+EDA augmentation on raw articles made things **worse**. Synonym contamination leaked into generation output — the model samples augmented variants at inference time, producing outputs like "pauperization additional assistance" and "Create Exploiter New". No coherence improvement over T1d. The Q&A format finding from T2a remains the only effective intervention so far.
 
 ---
 
