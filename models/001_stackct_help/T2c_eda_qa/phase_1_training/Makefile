@@ -1,0 +1,15 @@
+ROOT_DIR ?= ..
+
+.PHONY: retrieve synthesize augment train
+
+retrieve:
+	cd $(ROOT_DIR) && .venv/bin/python phase_1_training/retrieve_data.py
+
+synthesize:
+	cd $(ROOT_DIR) && .venv/bin/python phase_1_training/synthesize_qa.py
+
+augment:
+	cd $(ROOT_DIR) && .venv/bin/python phase_1_training/augment_qa_eda.py
+
+train:
+	cd $(ROOT_DIR) && time .venv/bin/python phase_1_training/train.py
