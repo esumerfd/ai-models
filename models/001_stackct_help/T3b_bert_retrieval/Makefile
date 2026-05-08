@@ -1,0 +1,34 @@
+ROOT_DIR := $(CURDIR)
+VENV := $(ROOT_DIR)/.venv
+PYTHON := $(VENV)/bin/python
+
+.PHONY: help venv train index retrieve clean-all
+
+help:
+	@echo "Usage: make <target>"
+	@echo ""
+	@echo "Pipeline:"
+	@echo "  train      MLM-pretrain the BERT encoder on article corpus"
+	@echo "  index      Encode all articles and build retrieval index"
+	@echo "  retrieve   Interactive retrieval REPL"
+	@echo ""
+	@echo "Cleanup:"
+	@echo "  clean-all  Remove all generated model artifacts"
+
+$(VENV)/bin/python:
+	python3.12 -m venv $(VENV)
+	$(VENV)/bin/pip install -q -r requirements.txt
+
+venv: $(VENV)/bin/python
+
+train: clean-all venv
+	$(MAKE) -C phase_1_pretrain ROOT_DIR=$(ROOT_DIR) train
+
+index: venv
+	$(MAKE) -C phase_2_index ROOT_DIR=$(ROOT_DIR) index
+
+retrieve: venv
+	$(MAKE) -C phase_3_retrieve ROOT_DIR=$(ROOT_DIR) retrieve
+
+clean-all:
+	rm -f gen/model_*.pth gen/article_index.npz
