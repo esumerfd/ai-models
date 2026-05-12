@@ -3,3 +3,5 @@ tokenizers
 gguf
 numpy<2
 nltk
+matplotlib
+scikit-learn

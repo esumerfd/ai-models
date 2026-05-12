@@ -2,3 +2,5 @@ torch
 sentencepiece
 gguf
 numpy<2
+matplotlib
+scikit-learn

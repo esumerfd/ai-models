@@ -2,7 +2,7 @@ ROOT_DIR := $(CURDIR)
 VENV := $(ROOT_DIR)/.venv
 PYTHON := $(VENV)/bin/python
 
-.PHONY: help venv retrieve train generate convert ollama-load ollama-run capabilities clean-gguf clean-all
+.PHONY: help venv retrieve train generate convert ollama-load ollama-run capabilities clean-gguf visualize clean-all
 
 help:
 	@echo "Usage: make <target>"
@@ -50,6 +50,9 @@ ollama-run:
 
 capabilities:
 	$(MAKE) -C phase_4_tools ROOT_DIR=$(ROOT_DIR) capabilities
+
+visualize: venv
+	$(MAKE) -C phase_5_visualize ROOT_DIR=$(ROOT_DIR) visualize
 
 clean-gguf:
 	$(MAKE) -C phase_3_conversion ROOT_DIR=$(ROOT_DIR) clean-gguf

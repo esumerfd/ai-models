@@ -2,7 +2,7 @@ ROOT_DIR := $(CURDIR)
 VENV := $(ROOT_DIR)/.venv
 PYTHON := $(VENV)/bin/python
 
-.PHONY: help venv train generate clean-all
+.PHONY: help venv train generate visualize clean-all
 
 help:
 	@echo "Usage: make <target>"
@@ -25,6 +25,9 @@ train: clean-all venv
 
 generate: venv
 	$(MAKE) -C phase_2_generation ROOT_DIR=$(ROOT_DIR) generate
+
+visualize: venv
+	$(MAKE) -C phase_3_visualize ROOT_DIR=$(ROOT_DIR) visualize
 
 clean-all:
 	rm -f gen/model_*.pth

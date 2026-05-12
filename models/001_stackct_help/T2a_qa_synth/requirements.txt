@@ -2,3 +2,5 @@ torch
 tokenizers
 gguf
 numpy<2
+matplotlib
+scikit-learn

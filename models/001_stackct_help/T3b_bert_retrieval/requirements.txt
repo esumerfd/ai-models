@@ -1,3 +1,5 @@
 torch
 tokenizers
 numpy<2
+matplotlib
+scikit-learn
