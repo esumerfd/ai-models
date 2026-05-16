@@ -1,287 +1,143 @@
 # Experiment Plan — STACK Support Language Models
 
-Compare different training techniques by applying each to the same problem:
-build a small language model from STACK support articles that can answer
-domain-specific questions, deployable to a Raspberry Pi AI HAT+ 2 (Hailo-10H,
-10 TOPS).
+Build and compare small language models trained on [STACK](https://www.stackct.com)
+construction estimating platform support articles. Goal: answer domain-specific questions,
+deployable to a Raspberry Pi AI HAT+ 2 (Hailo-10H, 10 TOPS).
 
-All experiments share the same evaluation criteria and the same hardware
-constraint. The goal is not performnce testing but learning.
-
----
-
-## Baseline
-
-**`models/001_stackct_help`** — Causal Language Model (GPT-style)
-
-Decoder-only transformer trained with next-token prediction. Already implemented.
-Serves as the reference point for all comparisons.
+All experiments share the same evaluation criteria and hardware constraint.
+The goal is learning, not production deployment.
 
 ---
 
-## Experiments: Data Retrieval
+## Status Legend
 
-The baseline retrieves HTML articles and strips all tags, collapsing each
-article into a single flat paragraph. This destroys structure that could help
-the model learn — tables become unreadable, numbered steps lose order, and
-nested lists flatten into run-on sentences.
-
-The following data format experiments test whether better input representation
-improves model output, independent of the training technique used.
-
-### DR-A — Markdown-Preserved
-
-**Format:** Convert HTML to proper Markdown instead of stripping it. Preserve
-headings (`##`, `###`), bullet lists, numbered steps, and tables using a
-library like `markdownify` or `html2text`.
-
-**What it tests:** Whether giving the model structural tokens (headings, list
-markers, table pipes) to learn from produces more coherent and structured
-output.
-
-**Key difference from baseline:** The retrieval script converts HTML to Markdown
-rather than stripping tags. Training pipeline is otherwise identical.
+| Symbol | Meaning |
+|---|---|
+| ✅ complete | Experiment run, results captured in `results.md` |
+| 🔄 in progress | Currently being built or trained |
+| ⏳ pending | Planned, not yet started |
+| ⏸ deferred | Out of scope for now |
 
 ---
 
-### DR-B — Structured QA Pairs
+## Experiment Status
 
-**Format:** Transform each article into explicit question/answer pairs that
-match how the model will be used at inference time:
+### Baseline
 
-```
-Q: Who can manage users in STACK Takeoff & Estimate?
-A: Account Owners have full access. Office Managers have limited access...
-```
-
-**What it tests:** Whether aligning training data format with the inference
-task (question in, answer out) improves response quality compared to training
-on raw article text.
-
-**Key difference from baseline:** Requires a transformation step to extract
-QA pairs from articles — either rule-based (headings become questions) or
-generated via a larger model.
+| ID | Description | Status | Finding |
+|---|---|---|---|
+| 001 | Causal LM (GPT-style), BPE 2K tokenizer, plain-text corpus | ✅ complete | Reference point for all comparisons. 3/5 on-topic responses. |
 
 ---
 
-### DR-C — Chunked Sections
+### Tokenization Variants
+*Same causal architecture and corpus — varies only the tokenizer.*
 
-**Format:** Split each article at its natural heading boundaries so each
-training sample is a coherent, focused topic. A permissions table becomes one
-chunk, a how-to procedure becomes another.
-
-**What it tests:** Whether smaller, focused training samples produce better
-results than feeding entire articles (which may span multiple unrelated topics)
-as single sequences.
-
-**Key difference from baseline:** Each article becomes multiple training
-samples rather than one. Total token count stays similar but context windows
-see more focused content.
+| ID | Tokenizer | Vocab | Status | Finding |
+|---|---|---|---|---|
+| T1a | Byte-level BPE | 2K | ✅ complete | Baseline. High UNK rate on domain terms. |
+| T1b | Byte-level BPE | 5K | ✅ complete | Improved coverage, similar quality. |
+| T1c | SentencePiece Unigram | 8K (corpus-limited to ~3K) | ✅ complete | Corpus too small for full 8K vocab. |
+| T1d | Byte-level BPE | 10K | ✅ complete | **Best tokenizer.** Zero UNK, best coverage. Carried forward. |
+| T1e | Morfessor (morphological) | corpus-derived | ✅ complete | Linguistically motivated but no quality improvement over BPE. |
 
 ---
 
-### DR-D — Markdown with Front Matter
+### Data Preparation Variants
+*Same architecture (causal, BBPE 10K) — varies how training data is prepared.*
 
-**Format:** Preserve Markdown structure (as in DR-A) and prepend metadata
-so the model learns document context:
+| ID | Technique | Status | Finding |
+|---|---|---|---|
+| T2a | Synthesized Q&A pairs (Claude-generated) | ✅ complete | **Best generative result.** 3/5 on-topic. Training data format matches inference task. |
+| T2b | EDA synonym augmentation (3× corpus expansion) | ✅ complete | Worse than T2a. Synonym contamination degrades domain vocabulary. |
+| T2c | EDA augmentation applied to Q&A pairs | ✅ complete | Worse than T2a. EDA ruled out — augmentation degrades quality at this scale. |
+| DR-A | Markdown-preserved (HTML → Markdown instead of stripping) | ⏳ pending | — |
+| DR-C | Chunked sections (split articles at heading boundaries) | ⏳ pending | — |
+| DR-D | Markdown + front matter (title/category/product metadata) | ⏳ pending | — |
 
-```
----
-title: Takeoff & Estimate Roles
-category: Permissions
-product: Takeoff & Estimate
----
-## Full-Access Roles
-...
-```
-
-**What it tests:** Whether metadata tokens help the model associate content
-with categories and products, improving its ability to route questions to the
-right domain knowledge.
-
-**Key difference from baseline:** Requires extracting category/product metadata
-from the Zendesk API (available in the article JSON) in addition to Markdown
-conversion.
+**DR-B** (Structured QA pairs) is covered by T2a. **DR-E** (JSON Lines) is deferred — token budget wasted on syntax.
 
 ---
 
-### DR-E — Structured JSON Lines
+### Architecture Variants
+*Same corpus (T2a Q&A pairs) — varies the model architecture.*
 
-**Format:** One JSON object per article with explicit fields:
-
-```json
-{"title": "...", "category": "...", "sections": [...], "related": [...]}
-```
-
-**What it tests:** Whether explicit field boundaries give the model a cleaner
-signal for separating title, content sections, and cross-references — at the
-cost of spending tokens on JSON syntax.
-
-**Key difference from baseline:** Not human-readable. The model must learn JSON
-structure in addition to the domain content. May waste token budget on
-punctuation.
+| ID | Architecture | Params | Status | Finding |
+|---|---|---|---|---|
+| T3a | T5-style encoder-decoder (seq2seq) | 5.1M | ✅ complete | 0/5 on-topic. Cross-attention requires ~100× more data to converge than available. |
+| T3b | BERT-style encoder + cosine retrieval | 5.8M | ✅ complete | 0/7 on-topic. MLM-only pretraining produces collapsed embeddings — no retrieval signal without contrastive training. |
 
 ---
 
-## Experiments: Training Technique
+### Fine-Tuning
+*Load a small pretrained open-source model and adapt it to the STACK domain.*
 
-### 002 — Masked Language Modeling (BERT-style)
-
-**Technique:** Randomly mask 15% of input tokens and train the model to predict
-them from bidirectional context using an encoder-only transformer.
-
-**What it tests:** Whether bidirectional context produces better representations
-of STACK support content than left-to-right prediction.
-
-**Key differences from baseline:**
-- Encoder-only architecture (no causal mask)
-- MLM pre-training objective with [MASK] tokens
-- Requires a task-specific head for generation (e.g. iterative refinement or a
-  separate small decoder)
-
-**Evaluation challenge:** MLM doesn't generate text natively. Test with
-fill-in-the-blank and extractive QA rather than open-ended generation.
+| ID | Technique | Base Model | Status | Finding |
+|---|---|---|---|---|
+| T4a | LoRA (Low-Rank Adaptation) | TBD (Qwen-0.5B or similar) | ⏳ pending | — |
+| T4b | DPO (Direct Preference Optimization) | TBD | ⏳ pending | Requires LoRA baseline first. |
 
 ---
 
-### 003 — Encoder-Decoder (T5-style)
+### Additional Training Techniques (from original plan)
+*Architectures defined in `plan.md` — status reflects current prioritization.*
 
-**Technique:** Separate encoder reads the input, decoder generates the output.
-Train with a span corruption objective — randomly replace text spans with
-sentinel tokens, then reconstruct the original spans.
-
-**What it tests:** Whether an explicit encode-then-decode architecture handles
-the question-answering pattern more naturally than a single decoder.
-
-**Key differences from baseline:**
-- Two-part architecture (encoder + decoder), roughly doubling parameter count
-  at the same layer size
-- Span corruption pre-training, then fine-tune on QA pairs
-- Cross-attention between encoder and decoder
-
-**Consideration:** May need to reduce layer count to stay within the Pi's
-memory budget.
+| ID | Technique | Status | Notes |
+|---|---|---|---|
+| 004 | ELECTRA (replaced token detection) | ⏸ deferred | Interesting for sample efficiency, but two-model training overhead not justified yet. |
+| 005 | LSTM language model | ⏸ deferred | Useful architecture baseline — deferred in favour of transformer variants. |
+| 006 | SSM / Mamba | ⏸ deferred | Requires CUDA; pure-PyTorch implementation needed for Pi deployment. |
+| 007 | Prefix language model | ⏸ deferred | Minimal change from baseline — could be run as a T1x variant. |
+| 008 | Denoising autoencoder (BART-style) | ⏸ deferred | Builds on seq2seq (T3a); revisit if more data available. |
 
 ---
 
-### 004 — Replaced Token Detection (ELECTRA-style)
+## Combination Matrix
 
-**Technique:** Train a small generator to propose plausible replacements for
-masked tokens. Train a discriminator to classify every token as original or
-replaced.
+The data preparation and fine-tuning dimensions interact. This table tracks
+which combinations are worth running and their priority.
 
-**What it tests:** Sample efficiency — ELECTRA learns from every token in the
-sequence, not just the 15% that are masked. With a small dataset like STACK
-support articles, this could matter.
+| Input Format | Training Approach | Experiment | Priority |
+|---|---|---|---|
+| Plain text (T2a Q&A) | From-scratch causal SLM | T2a | ✅ done — reference |
+| Plain text | LoRA fine-tuning | T4a | ⏳ high — next in sequence |
+| Markdown (DR-A) | From-scratch causal SLM | DR-A baseline | ⏳ medium — cheap format validation |
+| Markdown (DR-A) | LoRA fine-tuning | DR-A + LoRA | ⏳ medium — best-format + fine-tuning |
+| Chunked (DR-C) | From-scratch causal SLM | DR-C baseline | ⏳ low — run if DR-A shows improvement |
+| Markdown + metadata (DR-D) | From-scratch causal SLM | DR-D baseline | ⏳ low — metadata routing test |
+| Plain text | DPO | T4b | ⏳ planned — after LoRA baseline |
 
-**Key differences from baseline:**
-- Two-model setup during training (generator + discriminator)
-- Only the discriminator is kept for inference
-- Discriminator can be smaller than an equivalent MLM model for the same
-  performance
-
-**Consideration:** The generator can be very small (1/4 the discriminator size).
-Total training compute is higher but the final model may be more compact.
-
----
-
-### 005 — LSTM Language Model
-
-**Technique:** Replace the transformer with a stacked LSTM. Train with the same
-next-token prediction objective as the baseline.
-
-**What it tests:** Whether attention is necessary for this domain and dataset
-size, or whether a simpler recurrent architecture is sufficient.
-
-**Key differences from baseline:**
-- No attention mechanism — relies on hidden state for context
-- Sequential processing (no parallelism across sequence length during training)
-- Typically fewer parameters for the same hidden dimension
-
-**Consideration:** LSTMs struggle with long-range dependencies but may perform
-fine given the 128-token context window and short support articles.
+**Sequencing logic:** Run DR-A from-scratch first (cheap, reuses existing pipeline).
+If DR-A improves over T2a, carry Markdown format into LoRA. If neutral, go straight
+to T4a (plain + LoRA). DPO follows after a LoRA baseline exists.
 
 ---
 
-### 006 — State Space Model (Mamba-style)
+## Results Summary
 
-**Technique:** Replace transformer blocks with structured state space layers
-that model sequences as continuous-time linear systems, discretized for
-efficient computation.
+| Experiment | On-topic rate | Failure mode |
+|---|---|---|
+| T1d / T2a (best from-scratch) | **3 / 5** | Hallucination — answers shaped but partially wrong |
+| T3a seq2seq | 0 / 5 | Repetition loops — cross-attention did not converge |
+| T3b BERT retrieval | 0 / 7 | Collapsed embeddings — no retrieval signal from MLM alone |
 
-**What it tests:** Whether SSMs can match transformer quality at this scale
-while offering better inference efficiency — relevant for the constrained
-Pi hardware.
-
-**Key differences from baseline:**
-- Linear-time sequence processing (vs quadratic attention)
-- No explicit attention mechanism
-- Potentially faster inference on sequential generation
-
-**Consideration:** SSM libraries (mamba-ssm) currently require CUDA. May need
-a pure-PyTorch implementation for CPU/Hailo deployment.
+The causal decoder-only model (T2a) remains the best result across all from-scratch
+experiments. The hypothesis that more complex architectures (seq2seq, retrieval) would
+outperform it failed at this data scale (~225 Q&A pairs, ~1.1M character corpus).
+Fine-tuning a pretrained model (T4a LoRA) is the most promising next step.
 
 ---
 
-### 007 — Prefix Language Model
+## Evaluation Criteria
 
-**Technique:** Use the same decoder-only transformer but change the attention
-mask: a prefix portion (the question) attends bidirectionally, while the
-suffix (the answer) attends causally.
-
-**What it tests:** Whether giving the model bidirectional understanding of the
-question improves answer quality — a minimal change from the baseline.
-
-**Key differences from baseline:**
-- Modified attention mask only — same architecture, same parameter count
-- The prefix/suffix boundary must be marked in the training data
-- Training data needs explicit question/answer formatting
-
-**Consideration:** This is the smallest delta from the baseline and could be
-run as a variant within `001` rather than a separate model.
-
----
-
-### 008 — Denoising Autoencoder (BART-style)
-
-**Technique:** Corrupt input text using multiple noise functions (token masking,
-token deletion, sentence shuffling, span masking) and train an encoder-decoder
-to reconstruct the original.
-
-**What it tests:** Whether learning to reconstruct from diverse corruption
-produces more robust representations than single-objective training.
-
-**Key differences from baseline:**
-- Encoder-decoder architecture (similar to 003)
-- Multiple corruption strategies applied simultaneously
-- Pre-training is reconstruction; fine-tuning on QA
-
-**Consideration:** Similar architecture cost to 003 but with a more complex
-pre-training setup. The diversity of corruption may help with a small dataset.
-
----
-
-## Evaluation
-
-Each experiment will be evaluated on:
+Each experiment is evaluated on:
 
 | Metric | Method |
 |---|---|
-| **Training loss** | Final train/val loss curves |
-| **Perplexity** | On held-out 10% validation set |
-| **Generation quality** | Manual review of responses to a fixed set of 20 STACK support questions |
-| **Model size** | Parameter count and GGUF file size |
-| **Inference speed** | Tokens/second on CPU (Mac) and on Pi hardware |
-| **Memory usage** | Peak RSS during inference |
+| On-topic rate | Manual review: does the response correctly address the question? (n=5–7 standard questions) |
+| Training loss | Final train/val loss |
+| Response shape | Does output stop cleanly, loop, or hallucinate? |
+| Model size | Parameter count |
 
-## Experiment Order
-
-Suggested order based on implementation complexity and learning value:
-
-1. **005 — LSTM** — Simplest alternative, isolates the value of attention
-2. **007 — Prefix LM** — Minimal change from baseline, quick to implement
-3. **004 — ELECTRA** — Tests sample efficiency with small data
-4. **002 — MLM (BERT)** — Introduces bidirectional encoder architecture
-5. **003 — Encoder-Decoder (T5)** — Full seq2seq architecture
-6. **008 — Denoising (BART)** — Builds on 003 with richer pre-training
-7. **006 — SSM (Mamba)** — Most novel, depends on library availability
+Quantitative metrics (perplexity, BLEU) are not used — domain is too narrow and
+responses too short for these metrics to be meaningful.
