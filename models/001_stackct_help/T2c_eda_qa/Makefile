@@ -33,37 +33,37 @@ $(VENV)/bin/python:
 venv: $(VENV)/bin/python
 
 retrieve: venv
-	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) retrieve
+	$(MAKE) -C step_1_training ROOT_DIR=$(ROOT_DIR) retrieve
 
 synthesize: venv
-	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) synthesize
+	$(MAKE) -C step_1_training ROOT_DIR=$(ROOT_DIR) synthesize
 
 augment: venv
-	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) augment
+	$(MAKE) -C step_1_training ROOT_DIR=$(ROOT_DIR) augment
 
 train: clean-all venv
-	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) train
+	$(MAKE) -C step_1_training ROOT_DIR=$(ROOT_DIR) train
 
 generate: venv
-	$(MAKE) -C phase_2_generation ROOT_DIR=$(ROOT_DIR) generate
+	$(MAKE) -C step_2_generation ROOT_DIR=$(ROOT_DIR) generate
 
 convert: venv
-	$(MAKE) -C phase_3_conversion ROOT_DIR=$(ROOT_DIR) convert
+	$(MAKE) -C step_3_conversion ROOT_DIR=$(ROOT_DIR) convert
 
 ollama-load:
-	$(MAKE) -C phase_3_conversion ROOT_DIR=$(ROOT_DIR) ollama-load
+	$(MAKE) -C step_3_conversion ROOT_DIR=$(ROOT_DIR) ollama-load
 
 ollama-run:
 	ollama run stackslm
 
 capabilities:
-	$(MAKE) -C phase_4_tools ROOT_DIR=$(ROOT_DIR) capabilities
+	$(MAKE) -C step_4_tools ROOT_DIR=$(ROOT_DIR) capabilities
 
 visualize: venv
-	$(MAKE) -C phase_5_visualize ROOT_DIR=$(ROOT_DIR) visualize
+	$(MAKE) -C step_5_visualize ROOT_DIR=$(ROOT_DIR) visualize
 
 clean-gguf:
-	$(MAKE) -C phase_3_conversion ROOT_DIR=$(ROOT_DIR) clean-gguf
+	$(MAKE) -C step_3_conversion ROOT_DIR=$(ROOT_DIR) clean-gguf
 
 clean-all: clean-gguf
 	rm -f gen/*.pth gen/tokenizer.json

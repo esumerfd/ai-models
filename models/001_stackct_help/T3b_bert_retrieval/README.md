@@ -16,13 +16,13 @@ T3b_bert_retrieval/         # This experiment — BERT encoder + retrieval
 │   ├── model.py            # BertEncoder: bidirectional self-attention, MLM head, mean-pool
 │   └── tokenizer_utils.py  # Byte-level BPE 10K (shared from T1d/T2a)
 │
-├── phase_1_pretrain/
+├── step_1_pretrain/
 │   └── pretrain.py         # MLM training on article corpus
 │
-├── phase_2_index/
+├── step_2_index/
 │   └── build_index.py      # Encode articles → L2-normalised embedding index
 │
-├── phase_3_retrieve/
+├── step_3_retrieve/
 │   └── retrieve.py         # Query REPL: encode question → cosine similarity → top-K articles
 │
 ├── gen/                    # Generated artifacts (gitignored)

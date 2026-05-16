@@ -14,10 +14,10 @@ T3a_seq2seq/                # This experiment — encoder-decoder architecture
 │   ├── model.py            # Encoder, decoder, cross-attention, Seq2SeqTransformer
 │   └── tokenizer_utils.py  # Byte-level BPE 10K (shared from T2a)
 │
-├── phase_1_training/
+├── step_1_training/
 │   └── train.py            # Parses Q&A pairs, trains with teacher forcing
 │
-├── phase_2_generation/
+├── step_2_generation/
 │   └── generate.py         # Greedy decode REPL: encode question → decode answer
 │
 ├── gen/                    # Generated artifacts (gitignored)

@@ -20,16 +20,16 @@ T2c_eda_qa/                 # This experiment — EDA augmentation on Q&A answer
 │   ├── model.py            # Transformer: Head, MultiHeadAttention, Block, SmallLanguageModel
 │   └── tokenizer_utils.py  # Byte-level BPE tokenizer (carried forward from T1d)
 │
-├── phase_1_training/       # Data collection, synthesis, augmentation, and training
+├── step_1_training/       # Data collection, synthesis, augmentation, and training
 │   ├── retrieve_data.py    # Retrieves STACK support articles via Zendesk API
 │   ├── synthesize_qa.py    # Converts raw articles into Q&A pairs (from T2a)
 │   ├── augment_qa_eda.py   # Applies EDA to answer spans only — never questions
 │   └── train.py            # Training loop with scheduler and gradient clipping
 │
-├── phase_2_generation/     # Interactive inference
+├── step_2_generation/     # Interactive inference
 │   └── generate.py         # Chat REPL using the trained model
 │
-├── phase_3_conversion/     # Export for deployment
+├── step_3_conversion/     # Export for deployment
 │   ├── convert_to_gguf.py  # Converts .pth checkpoint to GGUF format
 │   └── modelfile-ollama    # Ollama Modelfile with system prompt
 │

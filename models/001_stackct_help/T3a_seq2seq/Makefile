@@ -21,13 +21,13 @@ $(VENV)/bin/python:
 venv: $(VENV)/bin/python
 
 train: clean-all venv
-	$(MAKE) -C phase_1_training ROOT_DIR=$(ROOT_DIR) train
+	$(MAKE) -C step_1_training ROOT_DIR=$(ROOT_DIR) train
 
 generate: venv
-	$(MAKE) -C phase_2_generation ROOT_DIR=$(ROOT_DIR) generate
+	$(MAKE) -C step_2_generation ROOT_DIR=$(ROOT_DIR) generate
 
 visualize: venv
-	$(MAKE) -C phase_3_visualize ROOT_DIR=$(ROOT_DIR) visualize
+	$(MAKE) -C step_3_visualize ROOT_DIR=$(ROOT_DIR) visualize
 
 clean-all:
 	rm -f gen/model_*.pth

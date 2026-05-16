@@ -20,15 +20,15 @@ T2a_qa_synth/               # This experiment — Q&A synthesis data prep
 │   ├── model.py            # Transformer: Head, MultiHeadAttention, Block, SmallLanguageModel
 │   └── tokenizer_utils.py  # Byte-level BPE tokenizer (carried forward from T1d)
 │
-├── phase_1_training/       # Data collection, synthesis, and model training
+├── step_1_training/       # Data collection, synthesis, and model training
 │   ├── retrieve_data.py    # Retrieves STACK support articles via Zendesk API
 │   ├── synthesize_qa.py    # Converts raw articles into Q&A training pairs
 │   └── train.py            # Training loop with scheduler and gradient clipping
 │
-├── phase_2_generation/     # Interactive inference
+├── step_2_generation/     # Interactive inference
 │   └── generate.py         # Chat REPL using the trained model
 │
-├── phase_3_conversion/     # Export for deployment
+├── step_3_conversion/     # Export for deployment
 │   ├── convert_to_gguf.py  # Converts .pth checkpoint to GGUF format
 │   └── modelfile-ollama    # Ollama Modelfile with system prompt
 │

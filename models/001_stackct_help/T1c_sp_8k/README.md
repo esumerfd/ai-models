@@ -20,14 +20,14 @@ T1c_sp_8k/                  # This experiment — SentencePiece Unigram tokenize
 │   ├── model.py            # Transformer: Head, MultiHeadAttention, Block, SmallLanguageModel
 │   └── tokenizer_utils.py  # SentencePiece tokenizer training and encode/decode helpers
 │
-├── phase_1_training/       # Data collection and model training
+├── step_1_training/       # Data collection and model training
 │   ├── retrieve_data.py    # Retrieves STACK support articles via Zendesk API
 │   └── train.py            # Training loop with scheduler and gradient clipping
 │
-├── phase_2_generation/     # Interactive inference
+├── step_2_generation/     # Interactive inference
 │   └── generate.py         # Chat REPL using the trained model
 │
-├── phase_3_conversion/     # Export for deployment
+├── step_3_conversion/     # Export for deployment
 │   ├── convert_to_gguf.py  # Converts .pth checkpoint to GGUF format
 │   └── modelfile-ollama    # Ollama Modelfile with system prompt
 │

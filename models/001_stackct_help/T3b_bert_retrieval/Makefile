@@ -23,13 +23,13 @@ $(VENV)/bin/python:
 venv: $(VENV)/bin/python
 
 train: clean-all venv
-	$(MAKE) -C phase_1_pretrain ROOT_DIR=$(ROOT_DIR) train
+	$(MAKE) -C step_1_pretrain ROOT_DIR=$(ROOT_DIR) train
 
 index: venv
-	$(MAKE) -C phase_2_index ROOT_DIR=$(ROOT_DIR) index
+	$(MAKE) -C step_2_index ROOT_DIR=$(ROOT_DIR) index
 
 retrieve: venv
-	$(MAKE) -C phase_3_retrieve ROOT_DIR=$(ROOT_DIR) retrieve
+	$(MAKE) -C step_3_retrieve ROOT_DIR=$(ROOT_DIR) retrieve
 
 visualize: venv
 	cd $(ROOT_DIR) && $(PYTHON) visualize_embeddings.py
