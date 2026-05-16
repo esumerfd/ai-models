@@ -13,10 +13,10 @@ The goal is learning, not production deployment.
 
 | Symbol | Meaning |
 |---|---|
-| ✅ complete | Experiment run, results captured in `results.md` |
-| 🔄 in progress | Currently being built or trained |
-| ⏳ pending | Planned, not yet started |
-| ⏸ deferred | Out of scope for now |
+| ✅ | Experiment run, results captured in `results.md` |
+| 🔄 | Currently being built or trained |
+| ⏳ | Planned, not yet started |
+| ⏸ | Out of scope for now |
 
 ---
 
@@ -26,7 +26,7 @@ The goal is learning, not production deployment.
 
 | ID | Description | Status | Finding |
 |---|---|---|---|
-| 001 | Causal LM (GPT-style), BPE 2K tokenizer, plain-text corpus | ✅ complete | Reference point for all comparisons. 3/5 on-topic responses. |
+| 001 | Causal LM (GPT-style), BPE 2K tokenizer, plain-text corpus | ✅ | Reference point for all comparisons. 3/5 on-topic responses. |
 
 ---
 
@@ -35,11 +35,11 @@ The goal is learning, not production deployment.
 
 | ID | Tokenizer | Vocab | Status | Finding |
 |---|---|---|---|---|
-| T1a | Byte-level BPE | 2K | ✅ complete | Baseline. High UNK rate on domain terms. |
-| T1b | Byte-level BPE | 5K | ✅ complete | Improved coverage, similar quality. |
-| T1c | SentencePiece Unigram | 8K (corpus-limited to ~3K) | ✅ complete | Corpus too small for full 8K vocab. |
-| T1d | Byte-level BPE | 10K | ✅ complete | **Best tokenizer.** Zero UNK, best coverage. Carried forward. |
-| T1e | Morfessor (morphological) | corpus-derived | ✅ complete | Linguistically motivated but no quality improvement over BPE. |
+| T1a | Byte-level BPE | 2K | ✅ | Baseline. High UNK rate on domain terms. |
+| T1b | Byte-level BPE | 5K | ✅ | Improved coverage, similar quality. |
+| T1c | SentencePiece Unigram | 8K (corpus-limited to ~3K) | ✅ | Corpus too small for full 8K vocab. |
+| T1d | Byte-level BPE | 10K | ✅ | **Best tokenizer.** Zero UNK, best coverage. Carried forward. |
+| T1e | Morfessor (morphological) | corpus-derived | ✅ | Linguistically motivated but no quality improvement over BPE. |
 
 ---
 
@@ -48,12 +48,12 @@ The goal is learning, not production deployment.
 
 | ID | Technique | Status | Finding |
 |---|---|---|---|
-| T2a | Synthesized Q&A pairs (Claude-generated) | ✅ complete | **Best generative result.** 3/5 on-topic. Training data format matches inference task. |
-| T2b | EDA synonym augmentation (3× corpus expansion) | ✅ complete | Worse than T2a. Synonym contamination degrades domain vocabulary. |
-| T2c | EDA augmentation applied to Q&A pairs | ✅ complete | Worse than T2a. EDA ruled out — augmentation degrades quality at this scale. |
-| DR-A | Markdown-preserved (HTML → Markdown instead of stripping) | ⏳ pending | — |
-| DR-C | Chunked sections (split articles at heading boundaries) | ⏳ pending | — |
-| DR-D | Markdown + front matter (title/category/product metadata) | ⏳ pending | — |
+| T2a | Synthesized Q&A pairs (Claude-generated) | ✅ | **Best generative result.** 3/5 on-topic. Training data format matches inference task. |
+| T2b | EDA synonym augmentation (3× corpus expansion) | ✅ | Worse than T2a. Synonym contamination degrades domain vocabulary. |
+| T2c | EDA augmentation applied to Q&A pairs | ✅ | Worse than T2a. EDA ruled out — augmentation degrades quality at this scale. |
+| DR-A | Markdown-preserved (HTML → Markdown instead of stripping) | ⏳ | — |
+| DR-C | Chunked sections (split articles at heading boundaries) | ⏳ | — |
+| DR-D | Markdown + front matter (title/category/product metadata) | ⏳ | — |
 
 **DR-B** (Structured QA pairs) is covered by T2a. **DR-E** (JSON Lines) is deferred — token budget wasted on syntax.
 
@@ -64,8 +64,8 @@ The goal is learning, not production deployment.
 
 | ID | Architecture | Params | Status | Finding |
 |---|---|---|---|---|
-| T3a | T5-style encoder-decoder (seq2seq) | 5.1M | ✅ complete | 0/5 on-topic. Cross-attention requires ~100× more data to converge than available. |
-| T3b | BERT-style encoder + cosine retrieval | 5.8M | ✅ complete | 0/7 on-topic. MLM-only pretraining produces collapsed embeddings — no retrieval signal without contrastive training. |
+| T3a | T5-style encoder-decoder (seq2seq) | 5.1M | ✅ | 0/5 on-topic. Cross-attention requires ~100× more data to converge than available. |
+| T3b | BERT-style encoder + cosine retrieval | 5.8M | ✅ | 0/7 on-topic. MLM-only pretraining produces collapsed embeddings — no retrieval signal without contrastive training. |
 
 ---
 
@@ -74,8 +74,8 @@ The goal is learning, not production deployment.
 
 | ID | Technique | Base Model | Status | Finding |
 |---|---|---|---|---|
-| T4a | LoRA (Low-Rank Adaptation) | TBD (Qwen-0.5B or similar) | ⏳ pending | — |
-| T4b | DPO (Direct Preference Optimization) | TBD | ⏳ pending | Requires LoRA baseline first. |
+| T4a | LoRA (Low-Rank Adaptation) | TBD (Qwen-0.5B or similar) | ⏳ | — |
+| T4b | DPO (Direct Preference Optimization) | TBD | ⏳ | Requires LoRA baseline first. |
 
 ---
 
@@ -84,11 +84,11 @@ The goal is learning, not production deployment.
 
 | ID | Technique | Status | Notes |
 |---|---|---|---|
-| 004 | ELECTRA (replaced token detection) | ⏸ deferred | Interesting for sample efficiency, but two-model training overhead not justified yet. |
-| 005 | LSTM language model | ⏸ deferred | Useful architecture baseline — deferred in favour of transformer variants. |
-| 006 | SSM / Mamba | ⏸ deferred | Requires CUDA; pure-PyTorch implementation needed for Pi deployment. |
-| 007 | Prefix language model | ⏸ deferred | Minimal change from baseline — could be run as a T1x variant. |
-| 008 | Denoising autoencoder (BART-style) | ⏸ deferred | Builds on seq2seq (T3a); revisit if more data available. |
+| 004 | ELECTRA (replaced token detection) | ⏸ | Interesting for sample efficiency, but two-model training overhead not justified yet. |
+| 005 | LSTM language model | ⏸ | Useful architecture baseline — deferred in favour of transformer variants. |
+| 006 | SSM / Mamba | ⏸ | Requires CUDA; pure-PyTorch implementation needed for Pi deployment. |
+| 007 | Prefix language model | ⏸ | Minimal change from baseline — could be run as a T1x variant. |
+| 008 | Denoising autoencoder (BART-style) | ⏸ | Builds on seq2seq (T3a); revisit if more data available. |
 
 ---
 
